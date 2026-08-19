@@ -3,6 +3,7 @@ name: Lint, Test and Report
 # Runs on every push, so a participant's branch push triggers the gate
 # before a pull request exists.
 on:
+  workflow_dispatch: 
   push:
   pull_request:
     types: [opened, synchronize, reopened]
