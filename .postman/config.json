@@ -1,0 +1,17 @@
+{
+  "workspace": {
+    "id": "e9462e60-2bc4-46ac-affc-375d23839eba"
+  },
+  "entities": {
+    "collections": [
+      "../postman/collections/PostFinanceCo API_52509354-164abc33-eeac-4079-b310-f2ca64fec0c8.postman_collection.json"
+    ],
+    "environments": [
+      "../postman/environments/Mock_52509354-f350dbab-4b53-42f5-b5ef-f99e75aff369.postman_environment.json",
+      "../postman/environments/Local Dev_52509354-93913ce0-af93-468b-bc21-c1af15f8928a.postman_environment.json"
+    ],
+    "specs": [],
+    "flows": [],
+    "globals": []
+  }
+}

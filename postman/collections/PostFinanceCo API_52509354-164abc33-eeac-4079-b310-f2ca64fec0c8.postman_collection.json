@@ -1,0 +1,2197 @@
+{
+  "info": {
+    "_postman_id": "164abc33-eeac-4079-b310-f2ca64fec0c8",
+    "name": "PostFinanceCo API",
+    "description": "The PostFinanceCo API makes it easy to manage transaction and account data. \n\n## Features\n- **Account Management**: Create, read, update, and delete bank accounts\n- **Transaction Processing**: Transfer funds between accounts or deposit to accounts\n- **Multiple Currencies**: Support for POST_COINS, POST_GOLD, and POST_BUCKS\n- **API Key Authentication**: Secure endpoints with API key validation\n- **Rate Limiting**: 300 requests per minute per API key\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Generate API key",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Contract tests: Generate API key (GET /api/v1/auth)\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Content-Type is application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\nconst schema = {\n    type: \"object\",\n    required: [\"apiKey\"],\n    properties: {\n        apiKey: { type: \"string\" }\n    }\n};\n\npm.test(\"Response body matches API key schema\", function () {\n    pm.response.to.have.jsonSchema(schema);\n});\n\npm.test(\"Response time is under 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\n// Capture API key for downstream authenticated requests\nif (pm.response.code >= 200 && pm.response.code < 300) {\n    const response = pm.response.json();\n    pm.collectionVariables.set(\"apiKey\", response.apiKey);\n}"
+                ]
+              }
+            }
+          ],
+          "id": "74f7d05a-6991-4b51-9b52-aeb07d79a261",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{adminUsername}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{adminPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth"
+              ]
+            },
+            "description": "Generates a new API key for accessing the PostFinanceCo APIs."
+          },
+          "response": [
+            {
+              "id": "b1d4d1d7-ca36-4b74-bf55-cf12ee1695dd",
+              "name": "Successful API key generation",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Basic <credentials>",
+                    "description": "Added as a part of security scheme: basic"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"apiKey\": \"123456789\"\n}"
+            },
+            {
+              "id": "c0837781-35d3-4cad-a6f1-b83b25dc3a02",
+              "name": "Internal server error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Basic <credentials>",
+                    "description": "Added as a part of security scheme: basic"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"serverError\",\n    \"message\": \"An unexpected error occurred\"\n  }\n}"
+            },
+            {
+              "id": "535eaa34-3f08-44d4-8eaa-2766a5a29cb0",
+              "name": "Authentication required or API key invalid",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Basic <credentials>",
+                    "description": "Added as a part of security scheme: basic"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"authenticationError\",\n    \"message\": \"API key is required. Please provide an API key in the x-api-key header.\"\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "id": "89c4271a-9014-45b8-95ff-eb6aca04837c",
+      "description": "Administrative operations including API key management"
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "List all accounts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Contract tests: List all accounts (GET /api/v1/accounts)\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Content-Type is application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\nconst schema = {\n    type: \"object\",\n    required: [\"accounts\"],\n    properties: {\n        accounts: {\n            type: \"array\",\n            items: {\n                type: \"object\",\n                required: [\"accountId\", \"owner\", \"createdAt\", \"balance\", \"currency\"],\n                properties: {\n                    accountId: { type: \"string\" },\n                    owner: { type: \"string\", minLength: 1 },\n                    createdAt: { type: \"string\" },\n                    balance: { type: \"number\", minimum: 0 },\n                    currency: { type: \"string\", enum: [\"POST_COINS\", \"POST_GOLD\", \"POST_BUCKS\"] }\n                }\n            }\n        }\n    }\n};\n\npm.test(\"Response body matches accounts-list schema\", function () {\n    pm.response.to.have.jsonSchema(schema);\n});\n\npm.test(\"accounts payload is an array\", function () {\n    pm.expect(pm.response.json().accounts).to.be.an(\"array\");\n});\n\npm.test(\"Response time is under 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});"
+                ]
+              }
+            }
+          ],
+          "id": "5ae671af-45ee-4049-82d0-4cc18f6f82ad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/accounts?owner=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts"
+              ],
+              "query": [
+                {
+                  "key": "owner",
+                  "value": "",
+                  "description": "Filter accounts by owner's full name"
+                }
+              ]
+            },
+            "description": "Retrieves a list of all accounts at PostFinanceCo. \nOptionally filter by owner name or creation date.\n"
+          },
+          "response": [
+            {
+              "id": "5a6087e7-ada8-44e1-954f-eb38445a7bb7",
+              "name": "Successful response with list of accounts",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts?owner=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ],
+                  "query": [
+                    {
+                      "key": "owner",
+                      "value": "",
+                      "description": "Filter accounts by owner's full name"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"accounts\": [\n    {\n      \"accountId\": \"123\",\n      \"owner\": \"Nova Newman\",\n      \"createdAt\": \"2023-04-10\",\n      \"balance\": 10000,\n      \"currency\": \"POST_COINS\"\n    },\n    {\n      \"accountId\": \"124\",\n      \"owner\": \"Gary Galaxy\",\n      \"createdAt\": \"2023-04-10\",\n      \"balance\": 237,\n      \"currency\": \"POST_COINS\"\n    }\n  ]\n}"
+            },
+            {
+              "id": "649dd72f-7fac-418c-8232-07dcbe939af1",
+              "name": "Authentication required or API key invalid",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts?owner=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ],
+                  "query": [
+                    {
+                      "key": "owner",
+                      "value": "",
+                      "description": "Filter accounts by owner's full name"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"authenticationError\",\n    \"message\": \"API key is required. Please provide an API key in the x-api-key header.\"\n  }\n}"
+            },
+            {
+              "id": "74412f7e-01f1-4192-86cf-919ac15f5e87",
+              "name": "No accounts found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts?owner=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ],
+                  "query": [
+                    {
+                      "key": "owner",
+                      "value": "",
+                      "description": "Filter accounts by owner's full name"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"accounts\": []\n}"
+            },
+            {
+              "id": "ee91b9d2-7524-4767-b64f-82cf2dd24831",
+              "name": "Too many requests - rate limit exceeded",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts?owner=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ],
+                  "query": [
+                    {
+                      "key": "owner",
+                      "value": "",
+                      "description": "Filter accounts by owner's full name"
+                    }
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": "0"
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"rateLimitExceeded\",\n    \"message\": \"Too many requests. Maximum 300 requests per minute allowed.\"\n  }\n}"
+            },
+            {
+              "id": "e2373c7d-9181-481a-97e8-8bf6709d9326",
+              "name": "Internal server error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts?owner=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ],
+                  "query": [
+                    {
+                      "key": "owner",
+                      "value": "",
+                      "description": "Filter accounts by owner's full name"
+                    }
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"serverError\",\n    \"message\": \"An unexpected error occurred\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create new account",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Set accountName: use environment value if present, otherwise generate a random full name\nconst envAccountName = pm.environment.get('accountName');\nif (envAccountName) {\n    pm.collectionVariables.set('accountName', envAccountName);\n} else {\n    pm.collectionVariables.set('accountName', pm.variables.replaceIn('{{$randomFullName}}'));\n}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Contract tests: Create new account (POST /api/v1/accounts)\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Content-Type is application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\nconst schema = {\n    type: \"object\",\n    required: [\"account\"],\n    properties: {\n        account: {\n            type: \"object\",\n            required: [\"accountId\"],\n            properties: {\n                accountId: { type: \"string\" }\n            }\n        }\n    }\n};\n\npm.test(\"Response body matches create-account schema\", function () {\n    pm.response.to.have.jsonSchema(schema);\n});\n\npm.test(\"Response time is under 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\n\npm.test(\"Request includes Idempotency-Key header\", function () {\n    const headerValue = pm.request.headers.get(\"Idempotency-Key\");\n    pm.expect(headerValue, \"Idempotency-Key header must be present on the request\").to.exist;\n    pm.expect(String(headerValue).trim(), \"Idempotency-Key header must not be empty\").to.not.equal(\"\");\n});\n\npm.test(\"Idempotency-Key header has a practical format\", function () {\n    const headerValue = String(pm.request.headers.get(\"Idempotency-Key\") || \"\").trim();\n    pm.expect(headerValue.length, \"Idempotency-Key should be at least 8 characters long\").to.be.at.least(8);\n    pm.expect(headerValue, \"Idempotency-Key should contain visible non-whitespace characters\").to.match(/^\\S+$/);\n});\n\npm.test(\"Idempotent-Replayed response header is boolean-compatible when present\", function () {\n    const replayed = pm.response.headers.get(\"Idempotent-Replayed\");\n    if (replayed !== undefined && replayed !== null) {\n        pm.expect(String(replayed).trim().toLowerCase()).to.be.oneOf([\"true\", \"false\", \"1\", \"0\"]);\n    }\n});\n\n// Capture accountId for downstream chaining\nif (pm.response.code >= 200 && pm.response.code < 300) {\n    const response = pm.response.json();\n    pm.collectionVariables.set(\"accountId\", response.account.accountId);\n}"
+                ]
+              }
+            }
+          ],
+          "id": "e28a33de-1fff-44b2-ba74-b8fc20a0f62d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "x-mock-response-code",
+                "value": "201"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"owner\": \"{{accountName}}\",\n  \"balance\": 500,\n  \"currency\": \"POST_GOLD\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts"
+              ]
+            },
+            "description": "Creates a new account at PostFinanceCo. The account will be assigned a unique ID.\nThe currency cannot be changed once the account is created.\n"
+          },
+          "response": [
+            {
+              "id": "270f9809-e18d-46cb-bd76-73b0e60897c6",
+              "name": "Account created successfully",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"owner\": \"Nora Newman\",\n  \"balance\": 500,\n  \"currency\": \"POST_GOLD\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Idempotent-Replayed",
+                  "value": "false"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"account\": {\n    \"accountId\": \"123\"\n  }\n}"
+            },
+            {
+              "id": "36f07173-0de4-4492-9bfd-c98d777d65fc",
+              "name": "Request validation failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"owner\": \"Nova Newman\",\n  \"currency\": \"POST_COINS\",\n  \"balance\": 500\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"validationError\",\n    \"message\": \"Owner name is required and must be a string\"\n  }\n}"
+            },
+            {
+              "id": "942b7784-d482-42fa-a43c-c7d8b6bac88e",
+              "name": "Authentication required or API key invalid",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"owner\": \"Nova Newman\",\n  \"currency\": \"POST_COINS\",\n  \"balance\": 500\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"authenticationError\",\n    \"message\": \"API key is required. Please provide an API key in the x-api-key header.\"\n  }\n}"
+            },
+            {
+              "id": "e736cd65-70c1-4d9b-bb14-61fe1436f073",
+              "name": "Too many requests - rate limit exceeded",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"owner\": \"Nova Newman\",\n  \"currency\": \"POST_COINS\",\n  \"balance\": 500\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": "0"
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"rateLimitExceeded\",\n    \"message\": \"Too many requests. Maximum 300 requests per minute allowed.\"\n  }\n}"
+            },
+            {
+              "id": "42760912-21f6-42f6-b49b-a2c1f8d7c859",
+              "name": "Internal server error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"owner\": \"Nova Newman\",\n  \"currency\": \"POST_COINS\",\n  \"balance\": 500\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"serverError\",\n    \"message\": \"An unexpected error occurred\"\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "id": "8b0918ae-1d13-43a8-a054-e1f1de4f3a50",
+      "description": "Account management operations. An account at the PostFinanceCo allows you to store funds.\nUse these endpoints to list, create, update, and delete accounts.\n"
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "List all transactions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Contract tests: List all transactions (GET /api/v1/transactions?accountId=...)\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Content-Type is application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\nconst schema = {\n    type: \"object\",\n    required: [\"transactions\"],\n    properties: {\n        transactions: {\n            type: \"array\",\n            items: {\n                type: \"object\",\n                required: [\"transactionId\", \"createdAt\", \"amount\", \"currency\", \"accountId\", \"transactionType\"],\n                properties: {\n                    transactionId: { type: \"string\" },\n                    createdAt: { type: \"string\" },\n                    amount: { type: \"number\", minimum: 0 },\n                    currency: { type: \"string\", enum: [\"POST_COINS\", \"POST_GOLD\", \"POST_BUCKS\"] },\n                    accountId: { type: \"string\" },\n                    transactionType: { type: \"string\", enum: [\"WITHDRAWAL\", \"DEPOSIT\"] }\n                }\n            }\n        }\n    }\n};\n\npm.test(\"Response body matches transactions-list schema\", function () {\n    pm.response.to.have.jsonSchema(schema);\n});\n\npm.test(\"transactions payload is an array\", function () {\n    pm.expect(pm.response.json().transactions).to.be.an(\"array\");\n});\n\npm.test(\"Response time is under 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});"
+                ]
+              }
+            }
+          ],
+          "id": "1a4f704c-ae2d-463c-99b5-407381066a4e",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/transactions?accountId={{accountId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "accountId",
+                  "value": "{{accountId}}",
+                  "description": "Filter transactions by source account ID"
+                }
+              ]
+            },
+            "description": "Retrieves a list of transactions.\n"
+          },
+          "response": [
+            {
+              "id": "f7b36b06-b6fb-442c-8396-f466f594b772",
+              "name": "Successful response with list of transactions",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions?accountId={{accountId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "accountId",
+                      "value": "{{accountId}}",
+                      "description": "Filter transactions by source account ID"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"transactions\": [\n    {\n      \"transactionId\": \"1\",\n      \"createdAt\": \"2024-01-10\",\n      \"amount\": 94857902,\n      \"currency\": \"POST_GOLD\",\n      \"accountId\": \"123\",\n      \"transactionType\": \"DEPOSIT\"\n    },\n    {\n      \"transactionId\": \"2\",\n      \"createdAt\": \"2024-01-10\",\n      \"amount\": 94857902,\n      \"currency\": \"POST_GOLD\",\n      \"accountId\": \"123\",\n      \"transactionType\": \"WITHDRAWAL\"\n    }\n  ]\n}"
+            },
+            {
+              "id": "f0acf96d-17cb-44b7-b1ad-30a657f49872",
+              "name": "Authentication required or API key invalid",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions?accountId={{accountId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "accountId",
+                      "value": "{{accountId}}",
+                      "description": "Filter transactions by source account ID"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"authenticationError\",\n    \"message\": \"API key is required. Please provide an API key in the x-api-key header.\"\n  }\n}"
+            },
+            {
+              "id": "fbf2b54a-a838-4fda-a953-5bd70eafca05",
+              "name": "No transactions found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions?accountId={{accountId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "accountId",
+                      "value": "{{accountId}}",
+                      "description": "Filter transactions by source account ID"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"transactions\": []\n}"
+            },
+            {
+              "id": "99b3dc9b-f709-41b9-b209-44ea84dce877",
+              "name": "Too many requests - rate limit exceeded",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions?accountId={{accountId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "accountId",
+                      "value": "{{accountId}}",
+                      "description": "Filter transactions by source account ID"
+                    }
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": "0"
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"rateLimitExceeded\",\n    \"message\": \"Too many requests. Maximum 300 requests per minute allowed.\"\n  }\n}"
+            },
+            {
+              "id": "cd541eda-b4bb-44d8-8240-ab80986d1058",
+              "name": "Internal server error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions?accountId={{accountId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "accountId",
+                      "value": "{{accountId}}",
+                      "description": "Filter transactions by source account ID"
+                    }
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"serverError\",\n    \"message\": \"An unexpected error occurred\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create new transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Contract tests: Create new transaction (POST /api/v1/transactions)\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Content-Type is application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\nconst schema = {\n    type: \"object\",\n    required: [\"transaction\"],\n    properties: {\n        transaction: {\n            type: \"object\",\n            required: [\"transactionId\"],\n            properties: {\n                transactionId: { type: \"string\" }\n            }\n        }\n    }\n};\n\npm.test(\"Response body matches create-transaction schema\", function () {\n    pm.response.to.have.jsonSchema(schema);\n});\n\npm.test(\"Response time is under 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\n\npm.test(\"Request includes Idempotency-Key header\", function () {\n    const headerValue = pm.request.headers.get(\"Idempotency-Key\");\n    pm.expect(headerValue, \"Idempotency-Key header must be present on the request\").to.exist;\n    pm.expect(String(headerValue).trim(), \"Idempotency-Key header must not be empty\").to.not.equal(\"\");\n});\n\npm.test(\"Idempotency-Key header has a practical format\", function () {\n    const headerValue = String(pm.request.headers.get(\"Idempotency-Key\") || \"\").trim();\n    pm.expect(headerValue.length, \"Idempotency-Key should be at least 8 characters long\").to.be.at.least(8);\n    pm.expect(headerValue, \"Idempotency-Key should contain visible non-whitespace characters\").to.match(/^\\S+$/);\n});\n\npm.test(\"Idempotent-Replayed response header is boolean-compatible when present\", function () {\n    const replayed = pm.response.headers.get(\"Idempotent-Replayed\");\n    if (replayed !== undefined && replayed !== null) {\n        pm.expect(String(replayed).trim().toLowerCase()).to.be.oneOf([\"true\", \"false\", \"1\", \"0\"]);\n    }\n});\n\n// Capture transactionId for downstream chaining\nif (pm.response.code >= 200 && pm.response.code < 300) {\n    const response = pm.response.json();\n    pm.collectionVariables.set(\"transactionId\", response.transaction.transactionId);\n}"
+                ]
+              }
+            }
+          ],
+          "id": "4464f7ba-0eee-4e21-92e6-454e13ae1037",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "x-mock-response-code",
+                "value": "201"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": \"{{accountId}}\",\n  \"amount\": 10000,\n  \"currency\": \"POST_GOLD\",\n  \"transactionType\": \"DEPOSIT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "transactions"
+              ]
+            },
+            "description": "Creates a new transaction. There are two types of transactions:\n- **Deposit**: Add money to an account by setting transactionType to \"DEPOSIT\"\n- **Withdrawal**: Remove money from an account by setting transactionType to \"WITHDRAWAL\"\n\n**Important**: Transactions cannot be edited or deleted once created.\n"
+          },
+          "response": [
+            {
+              "id": "2713162f-311d-4fc1-806e-3dee25e363c5",
+              "name": "Transaction created successfully",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"123\",\n  \"amount\": 10000,\n  \"currency\": \"POST_GOLD\",\n  \"transactionType\": \"DEPOSIT\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Idempotent-Replayed",
+                  "value": "false"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"transaction\": {\n    \"transactionId\": \"1\"\n  }\n}"
+            },
+            {
+              "id": "d3dc59f2-284f-4f9d-84c7-0af8f9fd0097",
+              "name": "Request validation failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"<string>\",\n  \"amount\": 10000,\n  \"currency\": \"POST_COINS\",\n  \"transactionType\": \"WITHDRAWAL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"validationError\",\n    \"message\": \"Unable to validate the request body\"\n  }\n}"
+            },
+            {
+              "id": "6712d0cd-4d2a-4444-97a5-472f0c611926",
+              "name": "Authentication required or API key invalid",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"<string>\",\n  \"amount\": 10000,\n  \"currency\": \"POST_COINS\",\n  \"transactionType\": \"WITHDRAWAL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"authenticationError\",\n    \"message\": \"API key is required. Please provide an API key in the x-api-key header.\"\n  }\n}"
+            },
+            {
+              "id": "7d663665-2e83-4ec7-8779-afa737942881",
+              "name": "Insufficient funds to complete the transaction",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"<string>\",\n  \"amount\": 10000,\n  \"currency\": \"POST_COINS\",\n  \"transactionType\": \"WITHDRAWAL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"txInsufficientFunds\",\n    \"message\": \"Not enough funds in source account to complete transaction.\"\n  }\n}"
+            },
+            {
+              "id": "f684288d-111f-411f-9382-51971b11656e",
+              "name": "The specified account does not exist",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"<string>\",\n  \"amount\": 10000,\n  \"currency\": \"POST_COINS\",\n  \"transactionType\": \"WITHDRAWAL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"instanceNotFoundError\",\n    \"message\": \"The specified account does not exist.\"\n  }\n}"
+            },
+            {
+              "id": "df52fdc7-74ac-4cbd-825e-92e69eec873b",
+              "name": "Too many requests - rate limit exceeded",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"<string>\",\n  \"amount\": 10000,\n  \"currency\": \"POST_COINS\",\n  \"transactionType\": \"WITHDRAWAL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": "0"
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"rateLimitExceeded\",\n    \"message\": \"Too many requests. Maximum 300 requests per minute allowed.\"\n  }\n}"
+            },
+            {
+              "id": "d080f9f7-4ec5-4a80-9c62-a762cd101a67",
+              "name": "Internal server error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"<string>\",\n  \"amount\": 10000,\n  \"currency\": \"POST_COINS\",\n  \"transactionType\": \"WITHDRAWAL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"serverError\",\n    \"message\": \"An unexpected error occurred\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get transaction by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "938a14f4-af3e-4042-b46f-e03646e5136a",
+                "exec": [
+                  "// Contract tests: Get transaction by ID (GET /api/v1/transactions/:transactionId)",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});",
+                  "",
+                  "const transactionSchema = {",
+                  "    type: \"object\",",
+                  "    required: [\"transactionId\", \"createdAt\", \"amount\", \"currency\", \"accountId\", \"transactionType\"],",
+                  "    properties: {",
+                  "        transactionId: { type: \"string\" },",
+                  "        createdAt: { type: \"string\" },",
+                  "        amount: { type: \"number\", minimum: 0 },",
+                  "        currency: { type: \"string\", enum: [\"POST_COINS\", \"POST_GOLD\", \"POST_BUCKS\"] },",
+                  "        accountId: { type: \"string\" },",
+                  "        transactionType: { type: \"string\", enum: [\"WITHDRAWAL\", \"DEPOSIT\"] }",
+                  "    }",
+                  "};",
+                  "",
+                  "const schema = {",
+                  "    type: \"object\",",
+                  "    required: [\"transaction\"],",
+                  "    properties: {",
+                  "        transaction: transactionSchema",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches transaction schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(schema);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is under 2200ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "458d561e-922f-42eb-a025-8d5088fbc547",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "transactions",
+                ":transactionId"
+              ],
+              "variable": [
+                {
+                  "key": "transactionId",
+                  "value": "{{transactionId}}"
+                }
+              ]
+            },
+            "description": "Retrieves detailed information about a specific transaction by its ID."
+          },
+          "response": [
+            {
+              "id": "f0703392-b755-4e0f-b663-4284588d2b46",
+              "name": "Transaction details retrieved successfully",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions",
+                    ":transactionId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "transactionId",
+                      "value": "{{transactionId}}",
+                      "description": "The unique identifier of the transaction"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"transaction\": {\n    \"transactionId\": \"1\",\n    \"createdAt\": \"2024-01-10\",\n    \"amount\": 10000,\n    \"currency\": \"POST_COINS\",\n    \"accountId\": \"123\",\n    \"transactionType\": \"DEPOSIT\"\n  }\n}"
+            },
+            {
+              "id": "e6bd6dfb-3882-4d59-bf9a-d255039af6c3",
+              "name": "Authentication required or API key invalid",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions",
+                    ":transactionId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "transactionId",
+                      "value": "{{transactionId}}",
+                      "description": "The unique identifier of the transaction"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"authenticationError\",\n    \"message\": \"API key is required. Please provide an API key in the x-api-key header.\"\n  }\n}"
+            },
+            {
+              "id": "8bc7d0d4-b4d5-48c7-9824-45b6272a24e0",
+              "name": "The specified transaction does not exist",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions",
+                    ":transactionId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "transactionId",
+                      "value": "{{transactionId}}",
+                      "description": "The unique identifier of the transaction"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"instanceNotFoundError\",\n    \"message\": \"The specified transaction does not exist.\"\n  }\n}"
+            },
+            {
+              "id": "1a197cd8-cf9c-4e74-9670-c039791a6f2c",
+              "name": "Too many requests - rate limit exceeded",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions",
+                    ":transactionId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "transactionId",
+                      "value": "{{transactionId}}",
+                      "description": "The unique identifier of the transaction"
+                    }
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-RateLimit-Limit",
+                  "value": ""
+                },
+                {
+                  "key": "X-RateLimit-Remaining",
+                  "value": "0"
+                },
+                {
+                  "key": "X-RateLimit-Reset",
+                  "value": ""
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"rateLimitExceeded\",\n    \"message\": \"Too many requests. Maximum 300 requests per minute allowed.\"\n  }\n}"
+            },
+            {
+              "id": "7c6e426f-25d4-4e1d-8e7a-5a691d8f4485",
+              "name": "Internal server error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-api-key",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "transactions",
+                    ":transactionId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "transactionId",
+                      "value": "{{transactionId}}",
+                      "description": "The unique identifier of the transaction"
+                    }
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"error\": {\n    \"name\": \"serverError\",\n    \"message\": \"An unexpected error occurred\"\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "id": "a65ee77a-9bbf-4cfe-ac78-93aaa8c474d1",
+      "description": "Transaction operations. A transaction records money moving in or out of an account.\nTransactions at the Galactic Bank follow a blockchain-like approach. Once created, \nthey cannot be updated or deleted.\n"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Attach the captured API key to authenticated requests (skip the auth-generation endpoint which uses Basic auth)\nconst apiKey = pm.collectionVariables.get(\"apiKey\") || pm.environment.get(\"apiKey\");\nif (apiKey && !pm.request.url.toString().includes(\"/api/v1/auth\")) {\n    pm.request.headers.upsert({ key: \"x-api-key\", value: apiKey });\n}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "apiKey",
+      "value": ""
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "transactionId",
+      "value": ""
+    },
+    {
+      "key": "accountName",
+      "value": ""
+    },
+    {
+      "key": "accountId",
+      "value": ""
+    }
+  ]
+}
