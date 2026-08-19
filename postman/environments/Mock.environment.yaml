@@ -1,0 +1,8 @@
+name: Mock
+values:
+  - key: baseUrl
+    value: 'https://adbaaeec-694c-4979-b0db-5d8bd791fc33.mock.pstmn.io'
+  - key: adminUsername
+    value: admin
+  - key: adminPassword
+    value: '1234'

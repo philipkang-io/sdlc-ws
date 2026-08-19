@@ -1,0 +1,13 @@
+workspace:
+  id: e9462e60-2bc4-46ac-affc-375d23839eba
+resourceNameMappings:
+  specs:
+    - ../postman/specs/PostFinanceCo API.yaml: PostFinanceCo API.yaml
+cloudResources:
+  collections:
+    ../postman/collections/PostFinanceCo API: 52509354-164abc33-eeac-4079-b310-f2ca64fec0c8
+  environments:
+    ../postman/environments/Local Dev.environment.yaml: 52509354-93913ce0-af93-468b-bc21-c1af15f8928a
+    ../postman/environments/Mock.environment.yaml: 52509354-f350dbab-4b53-42f5-b5ef-f99e75aff369
+  specs:
+    ../postman/specs/PostFinanceCo API.yaml: 4d20bea7-8566-4139-87de-3beef201e9ee
