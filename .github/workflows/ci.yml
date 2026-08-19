@@ -31,9 +31,11 @@ jobs:
             --workspace-id "${{ vars.POSTMAN_WORKSPACE_ID }}" \
             --report-events
 
+  # Deliberately does NOT depend on lint: the seeded spec fails governance,
+  # and we still want test results reporting to the API Catalog while the
+  # governance gate is red.
   test:
     name: API Smoke Tests
-    needs: [lint]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -87,7 +89,7 @@ jobs:
   # where `workspace push` deletes cloud-only changes.
   sync:
     name: Publish to Postman Cloud
-    needs: [test]
+    needs: [lint, test]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
