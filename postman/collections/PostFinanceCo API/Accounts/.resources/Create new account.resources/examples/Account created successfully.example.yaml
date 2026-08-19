@@ -23,6 +23,7 @@ response:
   statusText: Created
   headers:
     Content-Type: application/json
+    Idempotent-Replayed: "false"
     X-RateLimit-Limit: ""
     X-RateLimit-Remaining: ""
     X-RateLimit-Reset: ""

@@ -7,6 +7,8 @@ method: POST
 headers:
   Content-Type: application/json
   Accept: application/json
+  Idempotency-Key: "{{$guid}}"
+  x-mock-response-code: "201"
 body:
   type: json
   content: |-
@@ -90,6 +92,26 @@ scripts:
 
       pm.test("Response time is under 2000ms", function () {
           pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+
+
+      pm.test("Request includes Idempotency-Key header", function () {
+          const headerValue = pm.request.headers.get("Idempotency-Key");
+          pm.expect(headerValue, "Idempotency-Key header must be present on the request").to.exist;
+          pm.expect(String(headerValue).trim(), "Idempotency-Key header must not be empty").to.not.equal("");
+      });
+
+      pm.test("Idempotency-Key header has a practical format", function () {
+          const headerValue = String(pm.request.headers.get("Idempotency-Key") || "").trim();
+          pm.expect(headerValue.length, "Idempotency-Key should be at least 8 characters long").to.be.at.least(8);
+          pm.expect(headerValue, "Idempotency-Key should contain visible non-whitespace characters").to.match(/^\S+$/);
+      });
+
+      pm.test("Idempotent-Replayed response header is boolean-compatible when present", function () {
+          const replayed = pm.response.headers.get("Idempotent-Replayed");
+          if (replayed !== undefined && replayed !== null) {
+              pm.expect(String(replayed).trim().toLowerCase()).to.be.oneOf(["true", "false", "1", "0"]);
+          }
       });
 
       // Capture accountId for downstream chaining
