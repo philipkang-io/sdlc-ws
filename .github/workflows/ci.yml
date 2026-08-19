@@ -79,3 +79,27 @@ jobs:
             -e "postman/environments/Local Dev.environment.yaml" \
             --reporter-cli-no-success-assertions \
             --report-events
+
+  # Completes the Native Git loop: Local View -> Git -> CI -> Cloud View.
+  # Only runs on main, after lint and tests pass, so Cloud View reflects
+  # reviewed-and-merged work. Safe here because every change originates in
+  # Local View as a file; never add this to a workspace edited in Cloud View,
+  # where `workspace push` deletes cloud-only changes.
+  sync:
+    name: Publish to Postman Cloud
+    needs: [test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Postman CLI
+        run: curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+
+      - name: Push local artifacts to Postman Cloud
+        run: postman workspace push -y
