@@ -5,6 +5,11 @@ name: Lint, Test and Report
 on:
   workflow_dispatch: 
   push:
+    # branches MUST be defined. Per GitHub's workflow syntax, if only
+    # tags/tags-ignore is defined, the workflow will not run for events
+    # affecting the undefined ref -- so 'tags-ignore' alone silently
+    # disabled ALL branch pushes. Do not remove this line.
+    branches: ['**']
     tags-ignore: ['**']
   pull_request:
     types: [opened, synchronize, reopened]
