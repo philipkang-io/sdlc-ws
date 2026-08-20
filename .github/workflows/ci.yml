@@ -5,6 +5,7 @@ name: Lint, Test and Report
 on:
   workflow_dispatch: 
   push:
+    tags-ignore: ['**']
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -26,10 +27,12 @@ jobs:
       # Lints the spec file in this repo. The cloudResources.specs mapping in
       # .postman/resources.yaml resolves this path to the cloud spec UUID,
       # which is what allows --report-events to report into the API Catalog.
+      # No --workspace-id: the CLI defaults to the All workspaces governance
+      # group, where Agent Readiness is bound. One binding serves every seat,
+      # so nothing in this job is per-seat and a shared repo is safe.
       - name: Lint API spec
         run: |
           postman spec lint "postman/specs/PostFinanceCo API.yaml" \
-            --workspace-id "${{ vars.POSTMAN_WORKSPACE_ID }}" \
             --report-events
 
   # Deliberately does NOT depend on lint: the seeded spec fails governance,
