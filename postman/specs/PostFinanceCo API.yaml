@@ -62,14 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - apiKey
-                properties:
-                  apiKey:
-                    type: string
-                    description: The generated API key
-                    example: "123456789"
+                $ref: '#/components/schemas/ApiKeyResponse'
               example:
                 apiKey: "123456789"
         '401':
@@ -88,6 +81,15 @@ paths:
         Creates a new account at PostFinanceCo. The account will be assigned a unique ID.
         The currency cannot be changed once the account is created.
       operationId: createAccount
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: >-
+            A unique key to make this request idempotent. Use a UUID v4 or
+            similar globally-unique value.
+          schema:
+            $ref: '#/components/schemas/UuidString'
       requestBody:
         required: true
         content:
@@ -116,21 +118,12 @@ paths:
               $ref: '#/components/headers/X-RateLimit-Remaining'
             X-RateLimit-Reset:
               $ref: '#/components/headers/X-RateLimit-Reset'
+            Idempotent-Replayed:
+              $ref: '#/components/headers/Idempotent-Replayed'
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - account
-                properties:
-                  account:
-                    type: object
-                    required:
-                      - accountId
-                    properties:
-                      accountId:
-                        type: string
-                        description: The unique identifier of the created account
+                $ref: '#/components/schemas/CreateAccountResponse'
               example:
                 account:
                   accountId: "123"
@@ -156,7 +149,7 @@ paths:
           description: Filter accounts by owner's full name
           required: false
           schema:
-            type: string
+            $ref: '#/components/schemas/StringId'
           example: ""
       responses:
         '200':
@@ -171,14 +164,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - accounts
-                properties:
-                  accounts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Account'
+                $ref: '#/components/schemas/ListAccountsResponse'
               examples:
                 withResults:
                   summary: Accounts found
@@ -221,7 +207,7 @@ paths:
           description: Filter transactions by source account ID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/StringId'
           example: "123"
       responses:
         '200':
@@ -236,14 +222,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - transactions
-                properties:
-                  transactions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Transaction'
+                $ref: '#/components/schemas/ListTransactionsResponse'
               examples:
                 withResults:
                   summary: Transactions found
@@ -285,6 +264,15 @@ paths:
 
         **Important**: Transactions cannot be edited or deleted once created.
       operationId: createTransaction
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: >-
+            A unique key to make this request idempotent. Use a UUID v4 or
+            similar globally-unique value.
+          schema:
+            $ref: '#/components/schemas/UuidString'
       requestBody:
         required: true
         content:
@@ -316,21 +304,12 @@ paths:
               $ref: '#/components/headers/X-RateLimit-Remaining'
             X-RateLimit-Reset:
               $ref: '#/components/headers/X-RateLimit-Reset'
+            Idempotent-Replayed:
+              $ref: '#/components/headers/Idempotent-Replayed'
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - transaction
-                properties:
-                  transaction:
-                    type: object
-                    required:
-                      - transactionId
-                    properties:
-                      transactionId:
-                        type: string
-                        description: The unique identifier of the created transaction
+                $ref: '#/components/schemas/CreateTransactionResponse'
               example:
                 transaction:
                   transactionId: "1"
@@ -369,12 +348,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - transaction
-                properties:
-                  transaction:
-                    $ref: '#/components/schemas/Transaction'
+                $ref: '#/components/schemas/GetTransactionResponse'
               example:
                 transaction:
                   transactionId: "1"
@@ -389,6 +363,33 @@ paths:
           $ref: '#/components/responses/TransactionNotFound'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /.well-known/llms.txt:
+    get:
+      tags:
+        - Admin
+      summary: LLM metadata
+      description: >-
+        Returns a plain-text file describing the PostFinanceCo API for
+        consumption by large language models and AI agents. Follows the
+        llms.txt convention.
+      operationId: getLlmsTxt
+      security: []
+      responses:
+        '200':
+          description: LLM metadata file returned successfully
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StringId'
+              example: |-
+                # PostFinanceCo API
+                > Manage transaction and account data.
+                - /api/v1/auth — Generate API key (BasicAuth)
+                - /api/v1/accounts — Create and list accounts
+                - /api/v1/transactions — Create and list transactions
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -417,7 +418,7 @@ components:
       required: true
       description: The unique identifier of the account
       schema:
-        type: string
+        $ref: '#/components/schemas/StringId'
       example: "123"
     
     TransactionId:
@@ -426,29 +427,131 @@ components:
       required: true
       description: The unique identifier of the transaction
       schema:
-        type: string
+        $ref: '#/components/schemas/StringId'
       example: "1"
 
   headers:
     X-RateLimit-Limit:
       description: The maximum number of requests permitted per minute
       schema:
-        type: integer
-        example: 300
+        $ref: '#/components/schemas/IntegerValue'
     
     X-RateLimit-Remaining:
       description: The number of requests remaining in the current rate limit window
       schema:
-        type: integer
-        example: 299
+        $ref: '#/components/schemas/IntegerValue'
     
     X-RateLimit-Reset:
       description: The time at which the current rate limit window resets (UTC epoch seconds)
       schema:
-        type: integer
-        example: 1678901234
+        $ref: '#/components/schemas/IntegerValue'
+
+    Idempotency-Key:
+      description: >-
+        A unique key supplied by the client to make a request idempotent.
+        If the same key is reused within the idempotency window, the server
+        returns the cached response instead of processing the request again.
+        Use a UUID v4 or similar globally-unique value.
+      required: true
+      schema:
+        $ref: '#/components/schemas/UuidString'
+
+    Idempotent-Replayed:
+      description: >-
+        Indicates whether the response was replayed from a previous idempotent
+        request. Set to `true` when the server returns a cached response for a
+        repeated idempotency key; omitted or `false` on the first request.
+      schema:
+        $ref: '#/components/schemas/BooleanValue'
 
   schemas:
+    ApiKeyResponse:
+      type: object
+      required:
+        - apiKey
+      properties:
+        apiKey:
+          type: string
+          description: The generated API key
+          example: "123456789"
+
+    CreateAccountResponse:
+      type: object
+      required:
+        - account
+      properties:
+        account:
+          type: object
+          required:
+            - accountId
+          properties:
+            accountId:
+              type: string
+              description: The unique identifier of the created account
+
+    ListAccountsResponse:
+      type: object
+      required:
+        - accounts
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+
+    ListTransactionsResponse:
+      type: object
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+
+    CreateTransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          type: object
+          required:
+            - transactionId
+          properties:
+            transactionId:
+              type: string
+              description: The unique identifier of the created transaction
+
+    GetTransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          $ref: '#/components/schemas/Transaction'
+
+    StringId:
+      type: string
+      description: A string identifier
+      example: "123"
+
+    UuidString:
+      type: string
+      format: uuid
+      description: A UUID string
+      example: '123e4567-e89b-12d3-a456-426614174000'
+
+    IntegerValue:
+      type: integer
+      description: An integer value
+      example: 0
+
+    BooleanValue:
+      type: boolean
+      description: A boolean value
+      example: false
+
     Account:
       type: object
       required:
@@ -627,6 +730,9 @@ components:
   responses:
     Unauthorized:
       description: Authentication required or API key invalid
+      headers:
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:
@@ -658,6 +764,9 @@ components:
     
     AccountNotFound:
       description: The specified account does not exist
+      headers:
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:
@@ -679,6 +788,9 @@ components:
               message: "The specified transaction does not exist."
     TransactionValidationError:
       description: Request validation failed
+      headers:
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:
@@ -690,6 +802,9 @@ components:
                 message: "Unable to validate the request body"
     ValidationError:
       description: Request validation failed
+      headers:
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:
@@ -716,6 +831,9 @@ components:
     
     InsufficientFunds:
       description: Insufficient funds to complete the transaction
+      headers:
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:
@@ -731,11 +849,11 @@ components:
         X-RateLimit-Limit:
           $ref: '#/components/headers/X-RateLimit-Limit'
         X-RateLimit-Remaining:
-          schema:
-            type: integer
-            example: 0
+          $ref: '#/components/headers/X-RateLimit-Remaining'
         X-RateLimit-Reset:
           $ref: '#/components/headers/X-RateLimit-Reset'
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:
@@ -747,6 +865,9 @@ components:
     
     InternalServerError:
       description: Internal server error
+      headers:
+        Idempotent-Replayed:
+          $ref: '#/components/headers/Idempotent-Replayed'
       content:
         application/json:
           schema:

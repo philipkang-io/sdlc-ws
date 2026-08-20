@@ -118,6 +118,12 @@ scripts:
           }
       });
 
+      pm.test("Response body contains a non-empty transaction.transactionId string", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.nested.property("transaction.transactionId");
+          pm.expect(json.transaction.transactionId).to.be.a("string").and.to.not.equal("");
+      });
+
       // Capture transactionId for downstream chaining
       if (pm.response.code >= 200 && pm.response.code < 300) {
           const response = pm.response.json();
